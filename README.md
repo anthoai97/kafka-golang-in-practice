@@ -1,5 +1,7 @@
+### Intro
+This project using for learn to build an high performance Kafka Streaming Platform.
 
-### Start Project
+#### Start Project
 ```
 docker compose up -d
 ```
