@@ -1,6 +1,5 @@
 from image_processor.thumnail import generate_image_thumbnail
 
-
 #!/usr/bin/env python
 
 import sys
@@ -42,10 +41,11 @@ if __name__ == '__main__':
             elif msg.error():
                 print("ERROR: %s".format(msg.error()))
             else:
-                # Extract the (optional) key and value, and print.
-                print(msg)
-                print("Consumed event from topic {topic}: key = {key:12} value = {value:12}".format(
-                    topic=msg.topic(), key=msg.key().decode('utf-8'), value=msg.value().decode('utf-8')))
+                topic=msg.topic()
+                source = msg.value()
+                print("Consumed event from topic {topic}: value = {value:12}".format(
+                    topic=msg.topic(),  value=msg.value().decode('utf-8') 
+                ))
     except KeyboardInterrupt:
         pass
     finally:
