@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -11,6 +11,8 @@ import (
 var (
 	topic1      = "imageUpload"
 	kafkaBroker = "localhost:9094"
+
+	images = []string{"images/1.png", "images/2.png", "images/3.png", "images/4.png", "images/5.png", "images/6.png", "images/7.png", "images/8.png"}
 )
 
 func main() {
@@ -41,16 +43,13 @@ func main() {
 		}
 	}()
 
-	users := [...]string{"eabara", "jsmith", "sgarcia", "jbernard", "htanaka", "awalther"}
-	items := [...]string{"book", "alarm clock", "t-shirts", "gift card", "batteries"}
+	for n := 0; n < len(images); n++ {
+		time.Sleep(5 * time.Second)
 
-	for n := 0; n < 10; n++ {
-		key := users[rand.Intn(len(users))]
-		data := items[rand.Intn(len(items))]
 		p.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic1, Partition: kafka.PartitionAny},
-			Key:            []byte(key),
-			Value:          []byte(data),
+			Key:            []byte("source"),
+			Value:          []byte(images[n]),
 		}, nil)
 	}
 
