@@ -26,16 +26,9 @@ if __name__ == '__main__':
     # Create Consumer instance
     consumer = Consumer(config)
 
-    # Set up a callback to handle the '--reset' flag.
-    def reset_offset(consumer, partitions):
-        if args.reset:
-            for p in partitions:
-                p.offset = OFFSET_BEGINNING
-            consumer.assign(partitions)
-
     # Subscribe to topic
-    topic = config["topic_1"]
-    consumer.subscribe([topic], on_assign=reset_offset)
+    topic = "imageUpload"
+    consumer.subscribe([topic])
 
     # Poll for new messages from Kafka and print them.
     try:

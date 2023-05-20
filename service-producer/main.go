@@ -10,7 +10,7 @@ import (
 
 var (
 	topic1      = "imageUpload"
-	kafkaBroker = "localhost:9092"
+	kafkaBroker = "localhost:9094"
 )
 
 func main() {
