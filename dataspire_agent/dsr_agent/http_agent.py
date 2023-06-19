@@ -6,14 +6,13 @@ import requests
 
 AppType = TypeVar("AppType")
 
-
 class HttpAgent:
 	def __init__(
 		self: AppType,
 		*,
 		agentName: str = "DataSpire Agent",
 		target: str = "localhost:8080",
-		path: str = "/hook",
+		path: str = "/webhook",
 		timeout: int = 300,
 		interval: int = 3,
 	) -> None:
@@ -37,7 +36,7 @@ class HttpAgent:
 	def send(self, data: any):
 		try:
 			url = self.target + self.path
-			body = {'agent': self.agentName, 'data': str(data)}
+			body = {'agent': self.agentName, 'timestamp': time.mktime(datetime.datetime.now().timetuple()) , 'package': str(data)}
 			r = requests.post(url, timeout=self.timeout, data=body)
 			r.raise_for_status()
 			logging.info(str(r.status_code) + ' => ' + str(data))
@@ -66,5 +65,5 @@ if __name__ == "__main__":
 	for x in range(20):
 		time.sleep(1)
 		data = "Data " + str(x)
-		agent.sendInterval(data)
+		agent.sendInterval({'data' : "data {}".format(x)})
 		
