@@ -17,8 +17,8 @@ class HttpAgent:
 
 	def ping(self):
 		try:
-			url = self.target + '/ping'
-			r = requests.get(url, timeout=300)
+			url = self.target + '/hook'
+			r = requests.post(url, timeout=1)
 			r.raise_for_status()
 			logging.info(r.json())
 		except requests.exceptions.HTTPError as err:
