@@ -8,7 +8,7 @@ version = "0.0.2"
 authors = [
   { name="An Quach", email="anquach.dev@gmail.com" },
 ]
-description = "A small agent helper support DataSpire Ai Model"
+description = "A agent helper support DataSpire Ai Model"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
