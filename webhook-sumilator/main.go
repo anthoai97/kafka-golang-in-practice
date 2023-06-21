@@ -8,14 +8,14 @@ import (
 	"net"
 	"net/http"
 
-	pb "webhook-simulator/helloworld"
+	dsr "webhook-simulator/dsr_agent"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 )
 
 type server struct {
-	pb.UnimplementedGreeterServer
+	dsr.UnimplementedAgentServer
 }
 
 func main() {
@@ -32,7 +32,7 @@ func grpcServer() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	dsr.RegisterAgentServer(s, &server{})
 	log.Printf("Start Webhook Simulator gRPC Service at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
@@ -40,9 +40,9 @@ func grpcServer() {
 }
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+func (s *server) SendAgentMessage(ctx context.Context, in *dsr.AgentMessage) (*dsr.ServerReply, error) {
 	log.Printf("Received: %v", in.GetName())
-	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
+	return &dsr.ServerReply{Message: "Hello " + in.GetName()}, nil
 }
 
 func httpServer() {

@@ -57,7 +57,7 @@ class HttpAgent:
 			self.datas.append(data)
 	
 if __name__ == "__main__":
-	logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO, datefmt='%m/%d/%Y %I:%M:%S %p')
+	logging.basicConfig(format='%(asctime)s - %(threadName)s - %(processName)s - %(levelname)s: %(message)s', level=logging.INFO, datefmt='%m/%d/%Y %I:%M:%S %p')
 	target = "http://localhost:8080"
 	agent = HttpAgent(target=target)
 	agent.ping()

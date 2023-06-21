@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import helloworld_pb2 as helloworld__pb2
+import dsr_agent_pb2 as dsr__agent__pb2
 
 
-class GreeterStub(object):
+class AgentStub(object):
     """The greeting service definition.
     """
 
@@ -15,45 +15,45 @@ class GreeterStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.SayHello = channel.unary_unary(
-                '/helloworld.Greeter/SayHello',
-                request_serializer=helloworld__pb2.HelloRequest.SerializeToString,
-                response_deserializer=helloworld__pb2.HelloReply.FromString,
+        self.SendAgentMessage = channel.unary_unary(
+                '/dsr_agent.Agent/SendAgentMessage',
+                request_serializer=dsr__agent__pb2.AgentMessage.SerializeToString,
+                response_deserializer=dsr__agent__pb2.ServerReply.FromString,
                 )
 
 
-class GreeterServicer(object):
+class AgentServicer(object):
     """The greeting service definition.
     """
 
-    def SayHello(self, request, context):
-        """Sends a greeting
+    def SendAgentMessage(self, request, context):
+        """Sends a message
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_GreeterServicer_to_server(servicer, server):
+def add_AgentServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'SayHello': grpc.unary_unary_rpc_method_handler(
-                    servicer.SayHello,
-                    request_deserializer=helloworld__pb2.HelloRequest.FromString,
-                    response_serializer=helloworld__pb2.HelloReply.SerializeToString,
+            'SendAgentMessage': grpc.unary_unary_rpc_method_handler(
+                    servicer.SendAgentMessage,
+                    request_deserializer=dsr__agent__pb2.AgentMessage.FromString,
+                    response_serializer=dsr__agent__pb2.ServerReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'helloworld.Greeter', rpc_method_handlers)
+            'dsr_agent.Agent', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class Greeter(object):
+class Agent(object):
     """The greeting service definition.
     """
 
     @staticmethod
-    def SayHello(request,
+    def SendAgentMessage(request,
             target,
             options=(),
             channel_credentials=None,
@@ -63,8 +63,8 @@ class Greeter(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/helloworld.Greeter/SayHello',
-            helloworld__pb2.HelloRequest.SerializeToString,
-            helloworld__pb2.HelloReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/dsr_agent.Agent/SendAgentMessage',
+            dsr__agent__pb2.AgentMessage.SerializeToString,
+            dsr__agent__pb2.ServerReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
