@@ -1,12 +1,13 @@
 
 
-import asyncio
 import logging
-
+import time
 import grpc
 from http_agent import AppType
 from grpc_status import rpc_status
 from google.rpc import error_details_pb2
+from grpc_health.v1 import health_pb2
+from grpc_health.v1 import health_pb2_grpc
 
 import dsr_agent_pb2_grpc
 import dsr_agent_pb2
@@ -19,8 +20,8 @@ class GRPCAgent:
 		*,
 		agentName: str = "DataSpire Agent",
 		target: str = "localhost:8080",
-		timeout: int = 300,
-		interval: int = 3,
+		timeout: int = 300, # Secconds
+		interval: int = 3, # Secconds
 	) -> None:
 		self.target = target
 		self.timeout = timeout
@@ -49,11 +50,13 @@ class GRPCAgent:
 		except grpc.RpcError as rpc_error:
 			self._handleError(rpc_error=rpc_error)
 
+
+
 if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s - %(threadName)s - %(processName)s - %(levelname)s: %(message)s', level=logging.INFO, datefmt='%m/%d/%Y %I:%M:%S %p')
 	target = "localhost:50051"
-	agent = GRPCAgent(target=target)
-	agent.send()
+	agent = GRPCAgent(target=target, healthCheck=True)
+	# agent.health_check_call()
 	# asyncio.run(run())
 	# agent = HttpAgent(target=target)
 	# agent.ping()

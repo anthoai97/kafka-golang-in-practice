@@ -1,8 +1,11 @@
-import datetime
+from datetime import datetime, timedelta
+import json
 import logging
 import time
 from typing import TypeVar
 import requests
+
+from message_package import MessagePackage
 
 AppType = TypeVar("AppType")
 
@@ -14,15 +17,21 @@ class HttpAgent:
 		target: str = "localhost:8080",
 		path: str = "/webhook",
 		timeout: int = 300,
-		interval: int = 3,
+		interval: int = 0,
 	) -> None:
+		self.agentName = agentName
 		self.target = target
 		self.path = path
 		self.timeout = timeout
 		self.interval = interval
-		self.datas = []
-		self.savedTime = None
-		self.agentName = agentName
+		self.msgPack = self._initMessagePackage()
+
+	def _initMessagePackage(self) -> MessagePackage:
+		now = datetime.now()
+		return MessagePackage(
+			agent = self.agentName,
+			deadline = now + timedelta(seconds= self.interval),
+		)
 
 	def ping(self):
 		try:
@@ -35,35 +44,36 @@ class HttpAgent:
 
 	def send(self, data: any):
 		try:
+			self.msgPack.setData(data=data)
+			
+			if(self.msgPack.isReachDeadline() == False):
+				return;
+		
 			url = self.target + self.path
-			body = {'agent': self.agentName, 'timestamp': time.mktime(datetime.datetime.now().timetuple()) , 'package': str(data)}
-			r = requests.post(url, timeout=self.timeout, data=body)
+			body = self.msgPack.toMessage()
+			r = requests.post(
+				url, timeout=self.timeout,
+				data=json.dumps(body),
+				headers={
+					"Content-Type":"application/json",
+					'Accept': 'text/plain'
+					}
+				)
 			r.raise_for_status()
-			logging.info(str(r.status_code) + ' => ' + str(data))
+			logging.info(str(r.status_code) + ' => ' + str(body))
+			self.msgPack = self._initMessagePackage()
 		except requests.exceptions.HTTPError as err:
+			self.msgPack.setResend()
 			logging.error(err)
 
-	def sendInterval(self, data: any):
-		if self.savedTime is None:
-			self.savedTime = datetime.datetime.now()
-		
-		now = datetime.datetime.now()
-		x  = now - self.savedTime
-		if x.total_seconds() > self.interval:
-			self.send(self.datas)
-			self.savedTime = datetime.datetime.now()
-			self.datas = []
-		else:
-			self.datas.append(data)
-	
 if __name__ == "__main__":
 	logging.basicConfig(format='%(asctime)s - %(threadName)s - %(processName)s - %(levelname)s: %(message)s', level=logging.INFO, datefmt='%m/%d/%Y %I:%M:%S %p')
 	target = "http://localhost:8080"
-	agent = HttpAgent(target=target)
+	agent = HttpAgent(target=target, interval=2)
 	agent.ping()
 	data = "Data "
 	for x in range(20):
 		time.sleep(1)
 		data = "Data " + str(x)
-		agent.sendInterval({'data' : "data {}".format(x)})
+		agent.send({'request' : "data {}".format(x)})
 		

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -18,12 +17,18 @@ type server struct {
 	dsr.UnimplementedAgentServer
 }
 
+type MessagePackage struct {
+	Agent     string      `json:"agent"`
+	Data      interface{} `json:"data"`
+	Timestamp float32     `json:"timestamp"`
+}
+
 func main() {
 	fmt.Println("Start Webhook Simulator Service....")
-	// httpServer()
+	httpServer()
 
 	// grpc
-	grpcServer()
+	// grpcServer()
 }
 
 func grpcServer() {
@@ -65,10 +70,10 @@ func httpServer() {
 
 func HookHandler() func(*gin.Context) {
 	return func(c *gin.Context) {
-		fmt.Println(c.Request.Header)
-		body, _ := ioutil.ReadAll(c.Request.Body)
-		fmt.Println(string(body))
-
-		c.JSON(http.StatusOK, gin.H{"data": string(body)})
+		var req MessagePackage
+		if err := c.BindJSON(&req); err != nil {
+			fmt.Println(err.Error())
+		}
+		fmt.Printf("%+v\n", req)
 	}
 }
