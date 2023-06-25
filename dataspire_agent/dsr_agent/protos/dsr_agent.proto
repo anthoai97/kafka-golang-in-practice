@@ -18,18 +18,20 @@ package dsr_agent;
 
 option java_outer_classname = "DataSpireAgentProto";
 
-// The greeting service definition.
-service Agent {
+// The service definition.
+service DsrAgent {
   // Sends a message
-  rpc SendAgentMessage (AgentMessage) returns (ServerReply) {}
+  rpc SendMessage (GRPCMessagePackage) returns (ServerReply) {}
 }
 
-// The request message containing the user's name.
-message AgentMessage {
-  string name = 1;
+message GRPCMessagePackage {
+  string agent = 1;
+  string agent_id = 2;
+	string data = 3;
+	string timestamp = 4;
+	int32 resend = 5;
 }
 
-// The response message containing the greetings
 message ServerReply {
   string message = 1;
 }

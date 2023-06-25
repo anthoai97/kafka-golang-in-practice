@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 
 	dsr "webhook-simulator/dsr_agent"
 
@@ -14,13 +15,15 @@ import (
 )
 
 type server struct {
-	dsr.UnimplementedAgentServer
+	dsr.UnimplementedDsrAgentServer
 }
 
 type MessagePackage struct {
 	Agent     string      `json:"agent"`
 	Data      interface{} `json:"data"`
-	Timestamp float32     `json:"timestamp"`
+	Timestamp string      `json:"timestamp"`
+	AgentId   string      `json:"agent_id"`
+	Resend    int16       `json:"resend"`
 }
 
 func main() {
@@ -37,7 +40,7 @@ func grpcServer() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	dsr.RegisterAgentServer(s, &server{})
+	dsr.RegisterDsrAgentServer(s, &server{})
 	log.Printf("Start Webhook Simulator gRPC Service at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
@@ -45,9 +48,10 @@ func grpcServer() {
 }
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SendAgentMessage(ctx context.Context, in *dsr.AgentMessage) (*dsr.ServerReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	return &dsr.ServerReply{Message: "Hello " + in.GetName()}, nil
+func (s *server) SendMessage(ctx context.Context, in *dsr.GRPCMessagePackage) (*dsr.ServerReply, error) {
+	log.Printf("Received: %v", in.GetData())
+	time.Sleep(5 * time.Second)
+	return &dsr.ServerReply{Message: "Hello " + in.GetAgent()}, nil
 }
 
 func httpServer() {
@@ -74,6 +78,8 @@ func HookHandler() func(*gin.Context) {
 		if err := c.BindJSON(&req); err != nil {
 			fmt.Println(err.Error())
 		}
+		time.Sleep(4 * time.Second)
 		fmt.Printf("%+v\n", req)
+		c.JSON(200, "OK")
 	}
 }

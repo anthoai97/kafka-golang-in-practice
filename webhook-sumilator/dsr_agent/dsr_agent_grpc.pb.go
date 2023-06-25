@@ -18,88 +18,88 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// AgentClient is the client API for Agent service.
+// DsrAgentClient is the client API for DsrAgent service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AgentClient interface {
+type DsrAgentClient interface {
 	// Sends a message
-	SendAgentMessage(ctx context.Context, in *AgentMessage, opts ...grpc.CallOption) (*ServerReply, error)
+	SendMessage(ctx context.Context, in *GRPCMessagePackage, opts ...grpc.CallOption) (*ServerReply, error)
 }
 
-type agentClient struct {
+type dsrAgentClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAgentClient(cc grpc.ClientConnInterface) AgentClient {
-	return &agentClient{cc}
+func NewDsrAgentClient(cc grpc.ClientConnInterface) DsrAgentClient {
+	return &dsrAgentClient{cc}
 }
 
-func (c *agentClient) SendAgentMessage(ctx context.Context, in *AgentMessage, opts ...grpc.CallOption) (*ServerReply, error) {
+func (c *dsrAgentClient) SendMessage(ctx context.Context, in *GRPCMessagePackage, opts ...grpc.CallOption) (*ServerReply, error) {
 	out := new(ServerReply)
-	err := c.cc.Invoke(ctx, "/dsr_agent.Agent/SendAgentMessage", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/dsr_agent.DsrAgent/SendMessage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AgentServer is the server API for Agent service.
-// All implementations must embed UnimplementedAgentServer
+// DsrAgentServer is the server API for DsrAgent service.
+// All implementations must embed UnimplementedDsrAgentServer
 // for forward compatibility
-type AgentServer interface {
+type DsrAgentServer interface {
 	// Sends a message
-	SendAgentMessage(context.Context, *AgentMessage) (*ServerReply, error)
-	mustEmbedUnimplementedAgentServer()
+	SendMessage(context.Context, *GRPCMessagePackage) (*ServerReply, error)
+	mustEmbedUnimplementedDsrAgentServer()
 }
 
-// UnimplementedAgentServer must be embedded to have forward compatible implementations.
-type UnimplementedAgentServer struct {
+// UnimplementedDsrAgentServer must be embedded to have forward compatible implementations.
+type UnimplementedDsrAgentServer struct {
 }
 
-func (UnimplementedAgentServer) SendAgentMessage(context.Context, *AgentMessage) (*ServerReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendAgentMessage not implemented")
+func (UnimplementedDsrAgentServer) SendMessage(context.Context, *GRPCMessagePackage) (*ServerReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
 }
-func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
+func (UnimplementedDsrAgentServer) mustEmbedUnimplementedDsrAgentServer() {}
 
-// UnsafeAgentServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AgentServer will
+// UnsafeDsrAgentServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to DsrAgentServer will
 // result in compilation errors.
-type UnsafeAgentServer interface {
-	mustEmbedUnimplementedAgentServer()
+type UnsafeDsrAgentServer interface {
+	mustEmbedUnimplementedDsrAgentServer()
 }
 
-func RegisterAgentServer(s grpc.ServiceRegistrar, srv AgentServer) {
-	s.RegisterService(&Agent_ServiceDesc, srv)
+func RegisterDsrAgentServer(s grpc.ServiceRegistrar, srv DsrAgentServer) {
+	s.RegisterService(&DsrAgent_ServiceDesc, srv)
 }
 
-func _Agent_SendAgentMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AgentMessage)
+func _DsrAgent_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GRPCMessagePackage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).SendAgentMessage(ctx, in)
+		return srv.(DsrAgentServer).SendMessage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dsr_agent.Agent/SendAgentMessage",
+		FullMethod: "/dsr_agent.DsrAgent/SendMessage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).SendAgentMessage(ctx, req.(*AgentMessage))
+		return srv.(DsrAgentServer).SendMessage(ctx, req.(*GRPCMessagePackage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Agent_ServiceDesc is the grpc.ServiceDesc for Agent service.
+// DsrAgent_ServiceDesc is the grpc.ServiceDesc for DsrAgent service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Agent_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "dsr_agent.Agent",
-	HandlerType: (*AgentServer)(nil),
+var DsrAgent_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "dsr_agent.DsrAgent",
+	HandlerType: (*DsrAgentServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SendAgentMessage",
-			Handler:    _Agent_SendAgentMessage_Handler,
+			MethodName: "SendMessage",
+			Handler:    _DsrAgent_SendMessage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
