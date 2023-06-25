@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import json
 import threading
-import time
 from typing import TypeVar
 from logger import logger
 import requests
